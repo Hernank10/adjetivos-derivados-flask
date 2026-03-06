@@ -1,0 +1,995 @@
+{% extends "base.html" %}
+
+{% block title %}Sesión de Práctica - Adjetivos Derivados{% endblock %}
+
+{% block extra_css %}
+<style>
+    .practice-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    /* Timer Styles */
+    .timer-card {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(79, 70, 229, 0.3);
+        transition: all 0.3s;
+    }
+    
+    .timer-card.warning {
+        background: linear-gradient(135deg, #f59e0b, #dc2626);
+        animation: pulse 1s infinite;
+    }
+    
+    .timer-display {
+        font-size: 4rem;
+        font-weight: 700;
+        font-family: 'Courier New', monospace;
+        text-align: center;
+        line-height: 1.2;
+    }
+    
+    .timer-label {
+        text-align: center;
+        opacity: 0.9;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+    
+    .timer-progress {
+        height: 6px;
+        background: rgba(255,255,255,0.3);
+        border-radius: 3px;
+        margin-top: 1rem;
+        overflow: hidden;
+    }
+    
+    .timer-progress-bar {
+        height: 100%;
+        background: white;
+        width: 100%;
+        transition: width 1s linear;
+    }
+    
+    /* Question Card */
+    .question-card {
+        background: white;
+        border-radius: 30px;
+        padding: 2.5rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        position: relative;
+        border: 2px solid transparent;
+        transition: all 0.3s;
+    }
+    
+    .question-card.answered-correct {
+        border-color: #10b981;
+        background: #f0fdf4;
+    }
+    
+    .question-card.answered-incorrect {
+        border-color: #ef4444;
+        background: #fef2f2;
+    }
+    
+    .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .question-badge {
+        background: #e0e7ff;
+        color: #4f46e5;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+    }
+    
+    .difficulty-badge {
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+    }
+    
+    .difficulty-basic {
+        background: #d1fae5;
+        color: #059669;
+    }
+    
+    .difficulty-intermediate {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    
+    .difficulty-advanced {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    
+    .base-word-container {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .base-word {
+        font-size: 5rem;
+        font-weight: 800;
+        color: #1f2937;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 0.5rem;
+    }
+    
+    .base-label {
+        color: #6b7280;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+    
+    .suffix-question {
+        text-align: center;
+        font-size: 1.3rem;
+        color: #4b5563;
+        margin-bottom: 2rem;
+        background: #f3f4f6;
+        padding: 1rem;
+        border-radius: 50px;
+    }
+    
+    .suffix-highlight {
+        background: #4f46e5;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 600;
+        margin: 0 0.5rem;
+    }
+    
+    /* Answer Input Area */
+    .answer-area {
+        max-width: 500px;
+        margin: 0 auto 2rem;
+    }
+    
+    .answer-input-group {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .answer-input {
+        flex: 1;
+        padding: 1rem 1.5rem;
+        font-size: 1.2rem;
+        border: 3px solid #e5e7eb;
+        border-radius: 50px;
+        text-align: center;
+        transition: all 0.3s;
+    }
+    
+    .answer-input:focus {
+        outline: none;
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+    
+    .answer-input.correct {
+        border-color: #10b981;
+        background: #d1fae5;
+    }
+    
+    .answer-input.incorrect {
+        border-color: #ef4444;
+        background: #fee2e2;
+    }
+    
+    .suffix-buttons {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin: 1.5rem 0;
+    }
+    
+    .suffix-btn {
+        background: #f3f4f6;
+        border: 2px solid #e5e7eb;
+        color: #1f2937;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.2s;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+    
+    .suffix-btn:hover {
+        background: #e0e7ff;
+        border-color: #4f46e5;
+        transform: translateY(-2px);
+    }
+    
+    .suffix-btn.selected {
+        background: #4f46e5;
+        border-color: #4f46e5;
+        color: white;
+    }
+    
+    /* Feedback */
+    .feedback-message {
+        text-align: center;
+        padding: 1rem;
+        border-radius: 50px;
+        margin: 1.5rem 0;
+        font-weight: 600;
+        animation: slideIn 0.3s ease;
+    }
+    
+    .feedback-correct {
+        background: #d1fae5;
+        color: #059669;
+        border: 2px solid #10b981;
+    }
+    
+    .feedback-incorrect {
+        background: #fee2e2;
+        color: #dc2626;
+        border: 2px solid #ef4444;
+    }
+    
+    .feedback-info {
+        background: #e0e7ff;
+        color: #4f46e5;
+        border: 2px solid #4f46e5;
+    }
+    
+    /* Stats Panel */
+    .stats-panel {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+    }
+    
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .progress-section {
+        margin-top: 1rem;
+    }
+    
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        color: #4b5563;
+    }
+    
+    .progress-bar-container {
+        height: 12px;
+        background: #e5e7eb;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4f46e5, #7c3aed);
+        border-radius: 6px;
+        transition: width 0.3s ease;
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .submit-btn {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s;
+        flex: 2;
+    }
+    
+    .submit-btn:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(79, 70, 229, 0.4);
+    }
+    
+    .submit-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    .nav-btn {
+        background: white;
+        border: 2px solid #e5e7eb;
+        color: #1f2937;
+        padding: 1rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s;
+        flex: 1;
+    }
+    
+    .nav-btn:hover:not(:disabled) {
+        background: #4f46e5;
+        border-color: #4f46e5;
+        color: white;
+    }
+    
+    .nav-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    /* Hint */
+    .hint-container {
+        background: #fff7ed;
+        border-radius: 15px;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-left: 5px solid #f97316;
+    }
+    
+    .hint-text {
+        color: #9a3412;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Results Card */
+    .results-card {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: white;
+        border-radius: 30px;
+        padding: 3rem;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(79, 70, 229, 0.3);
+    }
+    
+    .final-score {
+        font-size: 6rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+    }
+    
+    .final-message {
+        font-size: 1.8rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stats-breakdown {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .breakdown-item {
+        background: rgba(255,255,255,0.2);
+        border-radius: 20px;
+        padding: 1.5rem;
+    }
+    
+    .breakdown-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+    
+    .breakdown-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .action-buttons-final {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .final-btn {
+        background: white;
+        color: #4f46e5;
+        border: none;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .final-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(255,255,255,0.3);
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.02);
+        }
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+    
+    .shake {
+        animation: shake 0.3s ease-in-out;
+    }
+    
+    @media (max-width: 768px) {
+        .base-word {
+            font-size: 3.5rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .final-score {
+            font-size: 4rem;
+        }
+        
+        .stats-breakdown {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="practice-container">
+    <div id="practiceSession">
+        <!-- Timer -->
+        <div id="timerCard" class="timer-card">
+            <div class="timer-display" id="timerDisplay">00:30</div>
+            <div class="timer-label">Tiempo restante para esta pregunta</div>
+            <div class="timer-progress">
+                <div class="timer-progress-bar" id="timerProgress" style="width: 100%"></div>
+            </div>
+        </div>
+        
+        <!-- Stats Panel -->
+        <div class="stats-panel">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="currentScore">0</div>
+                    <div class="stat-label">Puntaje</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="questionsAnswered">0</div>
+                    <div class="stat-label">Respondidas</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="correctCount">0</div>
+                    <div class="stat-label">Correctas</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="accuracyPercent">0%</div>
+                    <div class="stat-label">Precisión</div>
+                </div>
+            </div>
+            
+            <div class="progress-section">
+                <div class="progress-header">
+                    <span>Progreso general</span>
+                    <span id="progressText">0/10</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Question Card -->
+        <div class="question-card" id="questionCard">
+            <div class="question-header">
+                <span class="question-badge" id="questionNumber">Pregunta 1/10</span>
+                <span class="difficulty-badge" id="difficultyBadge">Básico</span>
+            </div>
+            
+            <div class="base-word-container">
+                <div class="base-word" id="baseWord">?</div>
+                <div class="base-label">Palabra base</div>
+            </div>
+            
+            <div class="suffix-question">
+                ¿Qué sufijo necesitas para formar el adjetivo?
+                <span class="suffix-highlight">+ _____</span>
+            </div>
+            
+            <!-- Hint (opcional) -->
+            <div class="hint-container" id="hintContainer" style="display: none;">
+                <p class="hint-text" id="hintText">
+                    <i class="fas fa-lightbulb"></i>
+                    Pista: Piensa en el significado
+                </p>
+            </div>
+            
+            <!-- Suffix Buttons -->
+            <div class="suffix-buttons" id="suffixButtons">
+                <button class="suffix-btn" onclick="selectSuffix('oso')">-oso</button>
+                <button class="suffix-btn" onclick="selectSuffix('ivo')">-ivo</button>
+                <button class="suffix-btn" onclick="selectSuffix('ar')">-ar</button>
+                <button class="suffix-btn" onclick="selectSuffix('ble')">-ble</button>
+                <button class="suffix-btn" onclick="selectSuffix('ario')">-ario</button>
+                <button class="suffix-btn" onclick="selectSuffix('dor')">-dor</button>
+                <button class="suffix-btn" onclick="selectSuffix('ico')">-ico</button>
+                <button class="suffix-btn" onclick="selectSuffix('al')">-al</button>
+                <button class="suffix-btn" onclick="selectSuffix('eño')">-eño</button>
+                <button class="suffix-btn" onclick="selectSuffix('udo')">-udo</button>
+            </div>
+            
+            <!-- Answer Input -->
+            <div class="answer-area">
+                <div class="answer-input-group">
+                    <input type="text" class="answer-input" id="answerInput" 
+                           placeholder="Escribe el sufijo (ej: oso)" autocomplete="off">
+                </div>
+                
+                <!-- Feedback -->
+                <div id="feedback" class="feedback-message" style="display: none;"></div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="submit-btn" id="submitBtn" onclick="submitAnswer()">
+                        <i class="fas fa-check-circle me-2"></i>Verificar
+                    </button>
+                    <button class="nav-btn" id="nextBtn" onclick="nextQuestion()" disabled>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Final Results -->
+    <div id="finalResults" style="display: none;">
+        <div class="results-card">
+            <i class="fas fa-trophy fa-5x mb-4"></i>
+            <div class="final-score" id="finalScore">10/10</div>
+            <div class="final-message" id="finalMessage">¡Excelente trabajo!</div>
+            
+            <div class="stats-breakdown">
+                <div class="breakdown-item">
+                    <div class="breakdown-value" id="finalCorrect">10</div>
+                    <div class="breakdown-label">Correctas</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-value" id="finalIncorrect">0</div>
+                    <div class="breakdown-label">Incorrectas</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-value" id="finalAccuracy">100%</div>
+                    <div class="breakdown-label">Precisión</div>
+                </div>
+            </div>
+            
+            <div class="stats-breakdown">
+                <div class="breakdown-item">
+                    <div class="breakdown-value" id="timeSpent">00:00</div>
+                    <div class="breakdown-label">Tiempo total</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-value" id="avgTime">00:00</div>
+                    <div class="breakdown-label">Tiempo promedio</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-value" id="fastestAnswer">00:00</div>
+                    <div class="breakdown-label">Respuesta más rápida</div>
+                </div>
+            </div>
+            
+            <div class="action-buttons-final">
+                <button class="final-btn" onclick="restartPractice()">
+                    <i class="fas fa-redo me-2"></i>Nueva práctica
+                </button>
+                <a href="/results" class="final-btn">
+                    <i class="fas fa-chart-line me-2"></i>Ver resultados
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Configuración
+let practiceConfig = {};
+let currentQuestionIndex = 0;
+let questions = [];
+let answers = [];
+let score = 0;
+let timer = null;
+let timeLeft = 30;
+let questionStartTime = null;
+let questionTimes = [];
+let totalTime = 0;
+
+// Inicializar
+document.addEventListener('DOMContentLoaded', function() {
+    const config = sessionStorage.getItem('practiceConfig');
+    if (config) {
+        practiceConfig = JSON.parse(config);
+        startPractice();
+    } else {
+        window.location.href = '/practice';
+    }
+});
+
+function startPractice() {
+    // Configurar timer según el modo
+    if (practiceConfig.mode === 'timed') {
+        timeLeft = 15; // 15 segundos para contrarreloj
+    } else {
+        timeLeft = 30; // 30 segundos para estándar
+    }
+    
+    document.getElementById('timerDisplay').textContent = formatTime(timeLeft);
+    
+    // Cargar preguntas
+    loadQuestions();
+}
+
+function loadQuestions() {
+    // Simular carga de preguntas (en producción vendrían de la API)
+    questions = [
+        { base: 'aceite', correctSuffix: 'oso', adjective: 'aceitoso', difficulty: 'basic', hint: 'Relacionado con el petróleo' },
+        { base: 'deporte', correctSuffix: 'ivo', adjective: 'deportivo', difficulty: 'basic', hint: 'Relacionado con el fútbol' },
+        { base: 'músculo', correctSuffix: 'ar', adjective: 'muscular', difficulty: 'intermediate', hint: 'Parte del cuerpo' },
+        { base: 'verde', correctSuffix: 'oso', adjective: 'verdoso', difficulty: 'basic', hint: 'Color de la hierba' },
+        { base: 'lavar', correctSuffix: 'ble', adjective: 'lavable', difficulty: 'intermediate', hint: 'Se puede limpiar' },
+        { base: 'banco', correctSuffix: 'ario', adjective: 'bancario', difficulty: 'intermediate', hint: 'Relacionado con el dinero' },
+        { base: 'ensordecer', correctSuffix: 'dor', adjective: 'ensordecedor', difficulty: 'advanced', hint: 'Muy ruidoso' },
+        { base: 'caro', correctSuffix: 'ísimo', adjective: 'carísimo', difficulty: 'advanced', hint: 'Superlativo' },
+        { base: 'peligro', correctSuffix: 'oso', adjective: 'peligroso', difficulty: 'intermediate', hint: 'Causa daño' },
+        { base: 'Brasil', correctSuffix: 'eño', adjective: 'brasileño', difficulty: 'advanced', hint: 'País sudamericano' }
+    ];
+    
+    // Inicializar respuestas
+    answers = new Array(questions.length).fill(null);
+    
+    // Mostrar primera pregunta
+    showQuestion(0);
+    updateStats();
+    startTimer();
+}
+
+function showQuestion(index) {
+    currentQuestionIndex = index;
+    const question = questions[index];
+    
+    // Actualizar UI
+    document.getElementById('questionNumber').textContent = `Pregunta ${index + 1}/${questions.length}`;
+    document.getElementById('baseWord').textContent = question.base;
+    
+    // Actualizar badge de dificultad
+    const difficultyBadge = document.getElementById('difficultyBadge');
+    difficultyBadge.className = 'difficulty-badge';
+    if (question.difficulty === 'basic') {
+        difficultyBadge.classList.add('difficulty-basic');
+        difficultyBadge.textContent = 'Básico';
+    } else if (question.difficulty === 'intermediate') {
+        difficultyBadge.classList.add('difficulty-intermediate');
+        difficultyBadge.textContent = 'Intermedio';
+    } else {
+        difficultyBadge.classList.add('difficulty-advanced');
+        difficultyBadge.textContent = 'Avanzado';
+    }
+    
+    // Mostrar hint si existe
+    if (question.hint) {
+        document.getElementById('hintText').innerHTML = `<i class="fas fa-lightbulb"></i> Pista: ${question.hint}`;
+        document.getElementById('hintContainer').style.display = 'block';
+    } else {
+        document.getElementById('hintContainer').style.display = 'none';
+    }
+    
+    // Limpiar input
+    document.getElementById('answerInput').value = '';
+    document.getElementById('answerInput').classList.remove('correct', 'incorrect');
+    document.getElementById('feedback').style.display = 'none';
+    
+    // Resetear clase de la tarjeta
+    document.getElementById('questionCard').classList.remove('answered-correct', 'answered-incorrect');
+    
+    // Resetear botones de sufijo
+    document.querySelectorAll('.suffix-btn').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    
+    // Si ya respondió esta pregunta, mostrar la respuesta
+    if (answers[index]) {
+        const answer = answers[index];
+        document.getElementById('answerInput').value = answer.answer;
+        if (answer.isCorrect) {
+            document.getElementById('answerInput').classList.add('correct');
+            document.getElementById('questionCard').classList.add('answered-correct');
+        } else {
+            document.getElementById('answerInput').classList.add('incorrect');
+            document.getElementById('questionCard').classList.add('answered-incorrect');
+        }
+        document.getElementById('submitBtn').disabled = true;
+    } else {
+        document.getElementById('submitBtn').disabled = false;
+        questionStartTime = Date.now();
+    }
+    
+    // Actualizar botón siguiente
+    document.getElementById('nextBtn').disabled = !answers[index] || index === questions.length - 1;
+}
+
+function selectSuffix(suffix) {
+    document.getElementById('answerInput').value = suffix;
+    document.getElementById('answerInput').focus();
+    
+    // Resaltar botón seleccionado
+    document.querySelectorAll('.suffix-btn').forEach(btn => {
+        btn.classList.remove('selected');
+        if (btn.textContent === `-${suffix}`) {
+            btn.classList.add('selected');
+        }
+    });
+}
+
+function submitAnswer() {
+    const input = document.getElementById('answerInput');
+    const answer = input.value.trim().toLowerCase().replace('-', '');
+    
+    if (!answer) {
+        alert('Por favor, escribe un sufijo');
+        return;
+    }
+    
+    // Calcular tiempo de respuesta
+    const responseTime = questionStartTime ? Math.round((Date.now() - questionStartTime) / 1000) : 0;
+    questionTimes.push(responseTime);
+    totalTime += responseTime;
+    
+    const question = questions[currentQuestionIndex];
+    const isCorrect = answer === question.correctSuffix;
+    
+    // Guardar respuesta
+    answers[currentQuestionIndex] = {
+        answer: answer,
+        isCorrect: isCorrect,
+        responseTime: responseTime
+    };
+    
+    // Actualizar puntaje
+    if (isCorrect) {
+        score++;
+        document.getElementById('questionCard').classList.add('answered-correct');
+        showFeedback('correct', '✅ ¡Correcto!');
+    } else {
+        document.getElementById('questionCard').classList.add('answered-incorrect');
+        showFeedback('incorrect', `❌ Incorrecto. La respuesta era: -${question.correctSuffix} (${question.adjective})`);
+    }
+    
+    // Actualizar UI
+    input.classList.add(isCorrect ? 'correct' : 'incorrect');
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('nextBtn').disabled = currentQuestionIndex === questions.length - 1;
+    
+    // Detener timer
+    if (timer) {
+        clearInterval(timer);
+    }
+    
+    // Actualizar estadísticas
+    updateStats();
+    
+    // Si es la última pregunta, mostrar resultados después de un momento
+    if (answers.every(a => a !== null)) {
+        setTimeout(showFinalResults, 1500);
+    }
+}
+
+function showFeedback(type, message) {
+    const feedback = document.getElementById('feedback');
+    feedback.style.display = 'block';
+    feedback.className = `feedback-message feedback-${type}`;
+    feedback.innerHTML = message;
+}
+
+function nextQuestion() {
+    if (currentQuestionIndex < questions.length - 1) {
+        showQuestion(currentQuestionIndex + 1);
+        resetTimer();
+    }
+}
+
+function updateStats() {
+    const answered = answers.filter(a => a !== null).length;
+    const correct = answers.filter(a => a?.isCorrect).length;
+    const accuracy = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+    
+    document.getElementById('currentScore').textContent = score;
+    document.getElementById('questionsAnswered').textContent = `${answered}/${questions.length}`;
+    document.getElementById('correctCount').textContent = correct;
+    document.getElementById('accuracyPercent').textContent = accuracy + '%';
+    
+    document.getElementById('progressText').textContent = `${answered}/${questions.length}`;
+    document.getElementById('progressBar').style.width = (answered / questions.length * 100) + '%';
+}
+
+function startTimer() {
+    if (timer) clearInterval(timer);
+    timeLeft = practiceConfig.mode === 'timed' ? 15 : 30;
+    updateTimerDisplay();
+    
+    timer = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        
+        if (timeLeft <= 5) {
+            document.getElementById('timerCard').classList.add('warning');
+        }
+        
+        if (timeLeft <= 0) {
+            handleTimeOut();
+        }
+    }, 1000);
+}
+
+function resetTimer() {
+    if (timer) clearInterval(timer);
+    startTimer();
+}
+
+function updateTimerDisplay() {
+    document.getElementById('timerDisplay').textContent = formatTime(timeLeft);
+    const percentage = (timeLeft / (practiceConfig.mode === 'timed' ? 15 : 30)) * 100;
+    document.getElementById('timerProgress').style.width = percentage + '%';
+}
+
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function handleTimeOut() {
+    clearInterval(timer);
+    
+    if (!answers[currentQuestionIndex]) {
+        // Marcar como incorrecta por tiempo
+        const question = questions[currentQuestionIndex];
+        answers[currentQuestionIndex] = {
+            answer: '',
+            isCorrect: false,
+            responseTime: 30
+        };
+        
+        document.getElementById('questionCard').classList.add('answered-incorrect');
+        showFeedback('info', '⏰ ¡Tiempo agotado!');
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('nextBtn').disabled = currentQuestionIndex === questions.length - 1;
+        
+        updateStats();
+        
+        // Si es la última pregunta, mostrar resultados
+        if (answers.every(a => a !== null)) {
+            setTimeout(showFinalResults, 1500);
+        }
+    }
+}
+
+function showFinalResults() {
+    document.getElementById('practiceSession').style.display = 'none';
+    document.getElementById('finalResults').style.display = 'block';
+    
+    const correct = answers.filter(a => a.isCorrect).length;
+    const total = questions.length;
+    const percentage = Math.round((correct / total) * 100);
+    const avgTime = totalTime / total;
+    const fastest = Math.min(...questionTimes);
+    
+    document.getElementById('finalScore').textContent = `${correct}/${total}`;
+    document.getElementById('finalCorrect').textContent = correct;
+    document.getElementById('finalIncorrect').textContent = total - correct;
+    document.getElementById('finalAccuracy').textContent = percentage + '%';
+    document.getElementById('timeSpent').textContent = formatTime(totalTime);
+    document.getElementById('avgTime').textContent = formatTime(Math.round(avgTime));
+    document.getElementById('fastestAnswer').textContent = formatTime(fastest);
+    
+    let message = '';
+    if (percentage >= 90) message = '¡Excelente! Dominas los adjetivos derivados.';
+    else if (percentage >= 70) message = '¡Muy bien! Sigue practicando.';
+    else if (percentage >= 50) message = 'Bien, pero puedes mejorar.';
+    else message = 'Sigue estudiando, ¡tú puedes lograrlo!';
+    
+    document.getElementById('finalMessage').textContent = message;
+    
+    // Guardar resultados (en producción se enviarían al backend)
+    saveResults();
+}
+
+function saveResults() {
+    const result = {
+        date: new Date().toLocaleString(),
+        mode: practiceConfig.mode === 'timed' ? 'Contrarreloj' : 'Estándar',
+        difficulty: practiceConfig.difficulty === 'mixed' ? 'Mixto' : 
+                   practiceConfig.difficulty === 'basic' ? 'Básico' :
+                   practiceConfig.difficulty === 'intermediate' ? 'Intermedio' : 'Avanzado',
+        score: answers.filter(a => a.isCorrect).length,
+        total: questions.length,
+        percentage: Math.round((answers.filter(a => a.isCorrect).length / questions.length) * 100)
+    };
+    
+    // Guardar en localStorage para la página de resultados
+    let results = JSON.parse(localStorage.getItem('practiceResults') || '[]');
+    results.push(result);
+    localStorage.setItem('practiceResults', JSON.stringify(results));
+}
+
+function restartPractice() {
+    sessionStorage.removeItem('practiceConfig');
+    window.location.href = '/practice';
+}
+</script>
+{% endblock %}

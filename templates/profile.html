@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block title %}Perfil - {{ user.username }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .profile-header {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: white;
+        border-radius: 30px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 20px 40px rgba(79, 70, 229, 0.3);
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: #4f46e5;
+        margin-bottom: 1rem;
+    }
+    
+    .profile-name {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .profile-meta {
+        display: flex;
+        gap: 2rem;
+        color: rgba(255,255,255,0.9);
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        background: #e0e7ff;
+        color: #4f46e5;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+    }
+    
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+    
+    .recent-practices {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .practice-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+        transition: background 0.3s;
+    }
+    
+    .practice-item:hover {
+        background: #f8fafc;
+    }
+    
+    .practice-info h4 {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .practice-meta {
+        display: flex;
+        gap: 1rem;
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+    
+    .practice-score {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #4f46e5;
+    }
+    
+    .badge-success {
+        background: #d1fae5;
+        color: #059669;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+    }
+    
+    .badge-warning {
+        background: #fef3c7;
+        color: #d97706;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+    }
+    
+    .badge-info {
+        background: #e0e7ff;
+        color: #4f46e5;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+    }
+    
+    .chart-container {
+        height: 300px;
+        margin-top: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h1 class="profile-name">{{ user.username }}</h1>
+                <div class="profile-meta">
+                    <span><i class="fas fa-envelope me-2"></i>{{ user.email }}</span>
+                    <span><i class="fas fa-calendar me-2"></i>Miembro desde {{ user.created_at.strftime('%d/%m/%Y') }}</span>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{{ url_for('practice') }}" class="btn btn-light btn-lg">
+                    <i class="fas fa-play me-2"></i>Nueva práctica
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <div class="stat-value">{{ total_practices }}</div>
+            <div class="stat-label">Prácticas totales</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-question-circle"></i>
+            </div>
+            <div class="stat-value">{{ total_questions }}</div>
+            <div class="stat-label">Preguntas respondidas</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-value">{{ total_correct }}</div>
+            <div class="stat-label">Respuestas correctas</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-chart-pie"></i>
+            </div>
+            <div class="stat-value">{{ avg_percentage }}%</div>
+            <div class="stat-label">Precisión promedio</div>
+        </div>
+    </div>
+    
+    <!-- Distribution by Difficulty -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="recent-practices">
+                <h3 class="section-title">
+                    <i class="fas fa-signal"></i>
+                    Distribución por dificultad
+                </h3>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Básico</span>
+                        <span class="badge-success">{{ by_difficulty.basic }} prácticas</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" style="width: {{ (by_difficulty.basic / total_practices * 100) if total_practices > 0 else 0 }}%"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Intermedio</span>
+                        <span class="badge-warning">{{ by_difficulty.intermediate }} prácticas</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" style="width: {{ (by_difficulty.intermediate / total_practices * 100) if total_practices > 0 else 0 }}%"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Avanzado</span>
+                        <span class="badge-danger">{{ by_difficulty.advanced }} prácticas</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-danger" style="width: {{ (by_difficulty.advanced / total_practices * 100) if total_practices > 0 else 0 }}%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Mixto</span>
+                        <span class="badge-info">{{ by_difficulty.mixed }} prácticas</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" style="width: {{ (by_difficulty.mixed / total_practices * 100) if total_practices > 0 else 0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="recent-practices">
+                <h3 class="section-title">
+                    <i class="fas fa-trophy"></i>
+                    Última práctica
+                </h3>
+                {% if last_practice %}
+                <div class="text-center p-4">
+                    <div class="display-1 fw-bold text-primary mb-3">{{ last_practice.percentage }}%</div>
+                    <h4>{{ last_practice.mode }} - {{ last_practice.difficulty }}</h4>
+                    <p class="text-muted">{{ last_practice.date.strftime('%d/%m/%Y %H:%M') }}</p>
+                    <p>Puntaje: {{ last_practice.score }}/{{ last_practice.total_questions }}</p>
+                </div>
+                {% else %}
+                <div class="text-center p-4">
+                    <i class="fas fa-chart-line fa-4x text-muted mb-3"></i>
+                    <p>No has realizado ninguna práctica aún.</p>
+                    <a href="{{ url_for('practice') }}" class="btn btn-primary">Comenzar ahora</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Practices -->
+    <div class="recent-practices">
+        <h3 class="section-title">
+            <i class="fas fa-history"></i>
+            Historial de prácticas
+        </h3>
+        
+        {% if practices %}
+            {% for practice in practices %}
+            <div class="practice-item">
+                <div class="practice-info">
+                    <h4>{{ practice.mode }} - {{ practice.difficulty }}</h4>
+                    <div class="practice-meta">
+                        <span><i class="fas fa-calendar"></i> {{ practice.date.strftime('%d/%m/%Y %H:%M') }}</span>
+                        <span><i class="fas fa-clock"></i> {{ practice.time_spent }}s</span>
+                    </div>
+                </div>
+                <div class="practice-score">
+                    {{ practice.score }}/{{ practice.total_questions }}
+                    <span class="badge-{{ 'success' if practice.percentage >= 70 else 'warning' if practice.percentage >= 50 else 'danger' }} ms-2">
+                        {{ practice.percentage }}%
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center p-4">
+                <i class="fas fa-history fa-4x text-muted mb-3"></i>
+                <p>No hay prácticas para mostrar.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
