@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Aprender - Adjetivos Derivados{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-5 mb-3">
+            <i class="fas fa-graduation-cap text-primary me-2"></i>
+            Aprende adjetivos derivados
+        </h1>
+        
+        <!-- Filtros -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-signal me-2"></i>Dificultad
+                        </label>
+                        <select name="difficulty" class="form-select">
+                            <option value="all" {% if current_difficulty == 'all' %}selected{% endif %}>Todas</option>
+                            <option value="basic" {% if current_difficulty == 'basic' %}selected{% endif %}>Básico</option>
+                            <option value="intermediate" {% if current_difficulty == 'intermediate' %}selected{% endif %}>Intermedio</option>
+                            <option value="advanced" {% if current_difficulty == 'advanced' %}selected{% endif %}>Avanzado</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-tag me-2"></i>Clasificación
+                        </label>
+                        <select name="classification" class="form-select">
+                            <option value="all" {% if current_classification == 'all' %}selected{% endif %}>Todas</option>
+                            <option value="calificativo" {% if current_classification == 'calificativo' %}selected{% endif %}>Calificativo</option>
+                            <option value="relacional" {% if current_classification == 'relacional' %}selected{% endif %}>Relacional</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-2"></i>Filtrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Result count -->
+        <div class="mb-3">
+            <p class="lead">
+                Mostrando <strong>{{ adjectives|length }}</strong> adjetivos
+                {% if current_difficulty != 'all' %}de nivel <span class="badge 
+                    {% if current_difficulty == 'basic' %}badge-basic
+                    {% elif current_difficulty == 'intermediate' %}badge-intermediate
+                    {% else %}badge-advanced{% endif %}">
+                    {{ difficulty_map[current_difficulty] }}
+                </span>{% endif %}
+            </p>
+        </div>
+        
+        <!-- Grid de adjetivos -->
+        <div class="row g-4">
+            {% for adj in adjectives %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span class="h5 mb-0">{{ adj.adjective }}</span>
+                        <span class="badge 
+                            {% if adj.difficulty == 'basic' %}badge-basic
+                            {% elif adj.difficulty == 'intermediate' %}badge-intermediate
+                            {% else %}badge-advanced{% endif %}">
+                            {{ difficulty_map[adj.difficulty] }}
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-primary me-2">Base</span>
+                                <code class="fs-5">{{ adj.base }}</code>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-success me-2">Sufijo</span>
+                                <code class="fs-5">+{{ adj.suffix }}</code>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <span class="badge bg-info me-2">Clasificación</span>
+                            <span>{{ adj.classification|capitalize }}</span>
+                            <br>
+                            <span class="badge bg-secondary me-2 mt-2">Subcategoría</span>
+                            <span>{{ adj.subcategory }}</span>
+                        </div>
+                        
+                        <div class="alert alert-light border">
+                            <i class="fas fa-quote-left text-muted me-1"></i>
+                            {{ adj.example }}
+                        </div>
+                        
+                        <p class="text-muted small mb-3">
+                            <i class="fas fa-info-circle me-1"></i>
+                            {{ adj.explanation }}
+                        </p>
+                        
+                        {% if adj.hint %}
+                        <div class="alert alert-info py-2 small">
+                            <i class="fas fa-lightbulb me-1"></i>
+                            {{ adj.hint }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if not adjectives %}
+        <div class="alert alert-info text-center py-5">
+            <i class="fas fa-info-circle fa-3x mb-3"></i>
+            <h4>No hay adjetivos</h4>
+            <p>No se encontraron adjetivos con los filtros seleccionados.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - Adjetivos Derivados{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row align-items-center min-vh-75 mb-5">
+    <div class="col-lg-6">
+        <h1 class="display-3 fw-bold mb-4">
+            Domina los <span class="text-primary">adjetivos derivados</span>
+        </h1>
+        <p class="lead mb-4 text-secondary">
+            Aprende de forma interactiva cómo se forman los adjetivos en español 
+            a partir de sustantivos, verbos y otros adjetivos.
+        </p>
+        
+        <div class="d-flex gap-3 mb-5">
+            <a href="{{ url_for('learn') }}" class="btn btn-primary btn-lg px-4">
+                <i class="fas fa-graduation-cap me-2"></i>Comenzar
+            </a>
+            <a href="{{ url_for('practice') }}" class="btn btn-outline-primary btn-lg px-4">
+                <i class="fas fa-play me-2"></i>Practicar
+            </a>
+        </div>
+        
+        <!-- Stats -->
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <div class="stats-number">{{ total_adjectives }}</div>
+                    <div class="stats-label">Adjetivos</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                    <div class="stats-number">21</div>
+                    <div class="stats-label">Sufijos</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <div class="stats-number">3</div>
+                    <div class="stats-label">Niveles</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-lightbulb me-2"></i>
+                ¿Cómo funcionan?
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-4">
+                    <div class="feature-icon">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h5>Base + Sufijo = Adjetivo</h5>
+                        <p class="text-muted mb-0">Los adjetivos se forman añadiendo sufijos a palabras base</p>
+                    </div>
+                </div>
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <code class="text-primary">aceite</code> + <code class="text-success">-oso</code>
+                            <br>
+                            <strong class="h5">→ aceitoso</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <code class="text-primary">deporte</code> + <code class="text-success">-ivo</code>
+                            <br>
+                            <strong class="h5">→ deportivo</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <code class="text-primary">verde</code> + <code class="text-success">-oso</code>
+                            <br>
+                            <strong class="h5">→ verdoso</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <code class="text-primary">lavar</code> + <code class="text-success">-ble</code>
+                            <br>
+                            <strong class="h5">→ lavable</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features -->
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <div class="feature-icon mx-auto">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h4>Aprende</h4>
+                <p class="text-muted">Explora 100 adjetivos con ejemplos y explicaciones detalladas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <div class="feature-icon mx-auto">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <h4>Flashcards</h4>
+                <p class="text-muted">Repasa con tarjetas interactivas y seguimiento de progreso</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <div class="feature-icon mx-auto">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h4>Evalúa</h4>
+                <p class="text-muted">Pon a prueba tu conocimiento con ejercicios prácticos</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
