@@ -1,0 +1,496 @@
+{% extends "base.html" %}
+
+{% block title %}Configurar Práctica - Adjetivos Derivados{% endblock %}
+
+{% block extra_css %}
+<style>
+    .setup-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .practice-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 30px;
+        padding: 3rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    
+    .mode-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 3px solid transparent;
+        height: 100%;
+    }
+    
+    .mode-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .mode-card.selected {
+        border-color: #4f46e5;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    }
+    
+    .mode-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #4f46e5;
+    }
+    
+    .mode-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #1f2937;
+    }
+    
+    .mode-description {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+    
+    .config-section {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .config-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .config-option {
+        background: #f8fafc;
+        border-radius: 15px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+    }
+    
+    .config-option:hover {
+        background: #f1f5f9;
+    }
+    
+    .config-option.selected {
+        border-color: #4f46e5;
+        background: #eef2ff;
+    }
+    
+    .config-option input[type="radio"] {
+        display: none;
+    }
+    
+    .config-option label {
+        width: 100%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .option-badge {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: white;
+    }
+    
+    .badge-basic {
+        background: linear-gradient(135deg, #4ade80, #22c55e);
+    }
+    
+    .badge-intermediate {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    }
+    
+    .badge-advanced {
+        background: linear-gradient(135deg, #f87171, #ef4444);
+    }
+    
+    .badge-mixed {
+        background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+    }
+    
+    .stats-preview {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: white;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .btn-start {
+        background: white;
+        color: #4f46e5;
+        border: none;
+        border-radius: 50px;
+        padding: 1rem 3rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+        transition: all 0.3s;
+        width: 100%;
+        margin-top: 2rem;
+    }
+    
+    .btn-start:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(255,255,255,0.3);
+    }
+    
+    .btn-start:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    .info-tooltip {
+        background: #eef2ff;
+        color: #4f46e5;
+        padding: 0.25rem 0.5rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <h1 class="display-5 mb-4">
+        <i class="fas fa-pencil-alt text-primary me-2"></i>
+        Configurar Práctica
+    </h1>
+    
+    <div class="practice-card">
+        <h2 class="text-center mb-4">Elige tu modo de práctica</h2>
+        
+        <!-- Modos de práctica -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="mode-card" id="modeStandard" onclick="selectMode('standard')">
+                    <div class="mode-icon">
+                        <i class="fas fa-pencil-alt"></i>
+                    </div>
+                    <div class="mode-title">Estándar</div>
+                    <div class="mode-description">
+                        Completa el sufijo para cada palabra base
+                    </div>
+                    <div class="info-tooltip mt-2">
+                        <i class="fas fa-clock"></i> 30 seg por pregunta
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mode-card" id="modeTimed" onclick="selectMode('timed')">
+                    <div class="mode-icon">
+                        <i class="fas fa-stopwatch"></i>
+                    </div>
+                    <div class="mode-title">Contrarreloj</div>
+                    <div class="mode-description">
+                        Responde antes de que termine el tiempo
+                    </div>
+                    <div class="info-tooltip mt-2">
+                        <i class="fas fa-hourglass"></i> 15 seg por pregunta
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mode-card" id="modeMarathon" onclick="selectMode('marathon')">
+                    <div class="mode-icon">
+                        <i class="fas fa-running"></i>
+                    </div>
+                    <div class="mode-title">Maratón</div>
+                    <div class="mode-description">
+                        Responde todas las preguntas sin límite
+                    </div>
+                    <div class="info-tooltip mt-2">
+                        <i class="fas fa-infinity"></i> Sin límite
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Configuración de dificultad -->
+        <div class="config-section">
+            <div class="config-title">
+                <i class="fas fa-signal"></i>
+                Nivel de dificultad
+            </div>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="config-option" onclick="selectDifficulty('mixed')">
+                        <input type="radio" name="difficulty" id="diffMixed" value="mixed" checked>
+                        <label for="diffMixed">
+                            <span class="option-badge badge-mixed">
+                                <i class="fas fa-random"></i>
+                            </span>
+                            <div>
+                                <strong>Mixto</strong>
+                                <br>
+                                <small>Todos los niveles</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="config-option" onclick="selectDifficulty('basic')">
+                        <input type="radio" name="difficulty" id="diffBasic" value="basic">
+                        <label for="diffBasic">
+                            <span class="option-badge badge-basic">B</span>
+                            <div>
+                                <strong>Básico</strong>
+                                <br>
+                                <small>25 adjetivos</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="config-option" onclick="selectDifficulty('intermediate')">
+                        <input type="radio" name="difficulty" id="diffIntermediate" value="intermediate">
+                        <label for="diffIntermediate">
+                            <span class="option-badge badge-intermediate">I</span>
+                            <div>
+                                <strong>Intermedio</strong>
+                                <br>
+                                <small>35 adjetivos</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="config-option" onclick="selectDifficulty('advanced')">
+                        <input type="radio" name="difficulty" id="diffAdvanced" value="advanced">
+                        <label for="diffAdvanced">
+                            <span class="option-badge badge-advanced">A</span>
+                            <div>
+                                <strong>Avanzado</strong>
+                                <br>
+                                <small>40 adjetivos</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Número de preguntas -->
+        <div class="config-section">
+            <div class="config-title">
+                <i class="fas fa-question-circle"></i>
+                Número de preguntas
+            </div>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="config-option" onclick="selectCount(5)">
+                        <input type="radio" name="count" id="count5" value="5">
+                        <label for="count5">
+                            <span class="option-badge" style="background: #6b7280;">5</span>
+                            <div>
+                                <strong>5 preguntas</strong>
+                                <br>
+                                <small>Rápido</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="config-option" onclick="selectCount(10)">
+                        <input type="radio" name="count" id="count10" value="10" checked>
+                        <label for="count10">
+                            <span class="option-badge" style="background: #6b7280;">10</span>
+                            <div>
+                                <strong>10 preguntas</strong>
+                                <br>
+                                <small>Recomendado</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="config-option" onclick="selectCount(15)">
+                        <input type="radio" name="count" id="count15" value="15">
+                        <label for="count15">
+                            <span class="option-badge" style="background: #6b7280;">15</span>
+                            <div>
+                                <strong>15 preguntas</strong>
+                                <br>
+                                <small>Intermedio</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="config-option" onclick="selectCount(20)">
+                        <input type="radio" name="count" id="count20" value="20">
+                        <label for="count20">
+                            <span class="option-badge" style="background: #6b7280;">20</span>
+                            <div>
+                                <strong>20 preguntas</strong>
+                                <br>
+                                <small>Completo</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Vista previa de estadísticas -->
+        <div class="stats-preview">
+            <h4 class="text-center mb-3">Resumen de tu práctica</h4>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <div class="stat-value" id="previewMode">Estándar</div>
+                        <div class="stat-label">Modo</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <div class="stat-value" id="previewDifficulty">Mixto</div>
+                        <div class="stat-label">Dificultad</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <div class="stat-value" id="previewCount">10</div>
+                        <div class="stat-label">Preguntas</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Botón de inicio -->
+        <button class="btn-start" id="startPractice" onclick="startPractice()">
+            <i class="fas fa-play-circle me-2"></i>
+            Comenzar práctica
+        </button>
+    </div>
+</div>
+
+<script>
+let selectedMode = 'standard';
+let selectedDifficulty = 'mixed';
+let selectedCount = 10;
+
+function selectMode(mode) {
+    selectedMode = mode;
+    
+    // Actualizar UI
+    document.querySelectorAll('.mode-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    document.getElementById(`mode${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.add('selected');
+    
+    // Actualizar vista previa
+    const modeNames = {
+        'standard': 'Estándar',
+        'timed': 'Contrarreloj',
+        'marathon': 'Maratón'
+    };
+    document.getElementById('previewMode').textContent = modeNames[mode];
+}
+
+function selectDifficulty(difficulty) {
+    selectedDifficulty = difficulty;
+    
+    // Actualizar UI
+    document.querySelectorAll('.config-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    const radioId = difficulty === 'mixed' ? 'diffMixed' : 
+                   difficulty === 'basic' ? 'diffBasic' :
+                   difficulty === 'intermediate' ? 'diffIntermediate' : 'diffAdvanced';
+    
+    document.getElementById(radioId).closest('.config-option').classList.add('selected');
+    document.getElementById(radioId).checked = true;
+    
+    // Actualizar vista previa
+    const diffNames = {
+        'mixed': 'Mixto',
+        'basic': 'Básico',
+        'intermediate': 'Intermedio',
+        'advanced': 'Avanzado'
+    };
+    document.getElementById('previewDifficulty').textContent = diffNames[difficulty];
+}
+
+function selectCount(count) {
+    selectedCount = count;
+    
+    // Actualizar UI
+    document.querySelectorAll('.config-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    document.getElementById(`count${count}`).closest('.config-option').classList.add('selected');
+    document.getElementById(`count${count}`).checked = true;
+    
+    // Actualizar vista previa
+    document.getElementById('previewCount').textContent = count;
+}
+
+function startPractice() {
+    const button = document.getElementById('startPractice');
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Iniciando...';
+    
+    // Guardar configuración en sessionStorage
+    sessionStorage.setItem('practiceConfig', JSON.stringify({
+        mode: selectedMode,
+        difficulty: selectedDifficulty,
+        count: selectedCount
+    }));
+    
+    // Redirigir a la sesión de práctica
+    setTimeout(() => {
+        window.location.href = '/practice/session';
+    }, 1000);
+}
+
+// Inicializar selecciones
+document.addEventListener('DOMContentLoaded', function() {
+    selectMode('standard');
+    selectDifficulty('mixed');
+    selectCount(10);
+});
+</script>
+{% endblock %}
